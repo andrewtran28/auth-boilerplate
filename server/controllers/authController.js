@@ -11,7 +11,7 @@ const generateAccessToken = (user) => {
 };
 
 const generateRefreshToken = (user) => {
-  return jwt.sign({ id: user.id }, process.env.JWT_REFRESHSECRET, {
+  return jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, {
     expiresIn: "7d", //7 days; long-lived token
   });
 };
@@ -79,7 +79,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 15 * 60 * 1000, // 15 min
+      maxAge: 15 * 60 * 1000, // 30 min
     });
 
     res.status(200).json({ success: true, message: "Token refreshed" });
