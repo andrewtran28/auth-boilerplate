@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, "public")));
 //Routes
 app.use("/api/auth", authRouter);
 
-//Global error andling middleware
+//Global error handling middleware
 app.use((err, req, res, next) => {
   console.error(`ERROR: ${req.method} ${req.url}`, {
     user: req.user ? req.user.username : "Unauthenticated user",

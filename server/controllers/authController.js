@@ -42,7 +42,6 @@ const logInUser = asyncHandler(async (req, res) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
-  // Send both tokens in cookies
   res
     .cookie("token", accessToken, {
       httpOnly: true,
