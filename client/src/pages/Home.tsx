@@ -2,25 +2,36 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 
 const Home = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) return <div>Loading...</div>;
+  const { user } = useAuth();
 
   return (
-    <div style={{ textAlign: "center", marginTop: "2rem" }}>
+    <>
       {user ? (
         <>
-          <h1>Welcome back, {user.username}!</h1>
-          <p>You are successfully logged in.</p>
+          <h1>
+            Welcome back, {user.firstName} ({user.username})!
+          </h1>
+          <hr />
+          <h2>User Information</h2>
+          <ul>
+            <li>Username: {user.username}</li>
+            <li>
+              Name: {user.firstName} {user.lastName}
+            </li>
+            <li>Email: {user.email}</li>
+            <li>User ID: {user.id}</li>
+            <li>Role: {user.isAdmin ? "Admin" : "User"}</li>
+          </ul>
         </>
       ) : (
         <>
+          <h1>No user is currently logged in.</h1>
           <p>
             Please <Link to="/login">Log In</Link> or <Link to="/signup">Sign Up</Link> to continue.
           </p>
         </>
       )}
-    </div>
+    </>
   );
 };
 

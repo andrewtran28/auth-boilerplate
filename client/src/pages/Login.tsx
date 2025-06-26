@@ -1,13 +1,12 @@
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
-import api from "../utils/axiosConfig";
 
 function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { user } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
@@ -15,11 +14,8 @@ function Login() {
     setErrorMessage("");
 
     try {
-      const response = await api.post("api/auth", { username, password }, { withCredentials: true });
-
-      if (response.status === 200) {
-        navigate("/");
-      }
+      await login(username, password);
+      navigate("/");
     } catch (error: any) {
       console.error("Login error: ", error);
       setErrorMessage(error.response?.data?.message || "Login failed. Please try again.");

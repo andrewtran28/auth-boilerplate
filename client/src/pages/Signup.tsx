@@ -9,7 +9,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | string[]>("");
   const navigate = useNavigate();
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
@@ -21,8 +21,13 @@ function Signup() {
 
       navigate("/login");
     } catch (error: any) {
-      if (import.meta.env.MODE === "development") console.error("Signup error:", error);
-      setErrorMessage(error.response?.data?.message || "Signup failed. Please try again.");
+      console.error("Signup error:", error);
+      const backendErrors = error.response?.data?.errors;
+      if (Array.isArray(backendErrors)) {
+        setErrorMessage(backendErrors);
+      } else {
+        setErrorMessage([error.response?.data?.message || "Signup failed. Please try again."]);
+      }
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -92,9 +97,13 @@ function Signup() {
         />
 
         {errorMessage && (
-          <p className="error-message" style={{ color: "red" }}>
-            {errorMessage}
-          </p>
+          <ul className="error-message">
+            {Array.isArray(errorMessage) ? (
+              errorMessage.map((msg, idx) => <li key={idx}>{msg}</li>)
+            ) : (
+              <li>{errorMessage}</li>
+            )}
+          </ul>
         )}
 
         <button type="submit">Sign Up</button>

@@ -5,10 +5,14 @@ type User = {
   id: string;
   username: string;
   isAdmin: boolean;
+  email: string;
+  firstName: string;
+  lastName: string;
 };
 
 type AuthContextType = {
   user: User | null;
+  login: (username: string, password: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -20,7 +24,6 @@ type AuthProviderProps = {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
 
   const getCurrentUser = async () => {
     try {
@@ -28,9 +31,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const login = async (username: string, password: string) => {
+    await axios.post("/api/auth", { username, password }, { withCredentials: true });
+    await getCurrentUser();
   };
 
   const logout = async () => {
@@ -47,7 +53,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     getCurrentUser();
   }, []);
 
-  return <AuthContext.Provider value={{ user, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
 };
 
 const useAuth = () => {

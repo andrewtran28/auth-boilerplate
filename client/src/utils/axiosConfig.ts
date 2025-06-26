@@ -13,7 +13,7 @@ api.interceptors.response.use(
 
     const isAuthRoute = originalRequest.url.includes("/api/auth") || originalRequest.url.includes("/api/users");
 
-    // Avoid infinite refresh loops and skip refreshing for public/auth/signup routes
+    // Avoid infinite refresh loops and skip refreshing for public routes
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       originalRequest._retry = true;
 
@@ -25,7 +25,7 @@ api.interceptors.response.use(
       }
     }
 
-    return Promise.reject(error); // Let caller handle the error (e.g. form error messages)
+    return Promise.reject(error);
   }
 );
 

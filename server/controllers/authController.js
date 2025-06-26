@@ -61,7 +61,7 @@ const logInUser = asyncHandler(async (req, res) => {
 
 //Clears the token
 const logOutUser = (req, res) => {
-  res.clearCookie("token").res.clearCookie("refreshToken").json({ success: true, message: "Logged out" });
+  res.clearCookie("token").clearCookie("refreshToken").json({ success: true, message: "Logged out" });
 };
 
 const refreshToken = asyncHandler(async (req, res) => {

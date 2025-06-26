@@ -1,10 +1,11 @@
+//CustomError class throws a custom array of error messages
 class CustomError extends Error {
-  constructor(statusCode, message) {
-    super(message); // Call the parent Error constructor
+  constructor(statusCode, message, details = []) {
+    super(message);
     this.statusCode = statusCode;
     this.isOperational = true;
+    this.details = details;
 
-    // Capture the stack trace (optional, for debugging)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CustomError);
     }

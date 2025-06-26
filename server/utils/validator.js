@@ -64,7 +64,9 @@ const handleValidationErrors = (req) => {
   const result = validationResult(req);
   if (!result.isEmpty()) {
     const errorMessages = result.errors.map((err) => (err.param ? `${err.msg} (${err.param})` : err.msg));
-    throw new CustomError(400, `${errorMessages.join(" ")}`);
+    const error = new CustomError(400, "Validation failed");
+    error.details = errorMessages;
+    throw error;
   }
 };
 
