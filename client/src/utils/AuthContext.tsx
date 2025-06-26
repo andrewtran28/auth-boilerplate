@@ -3,7 +3,7 @@ import axios from "./axiosConfig";
 
 type User = {
   id: string;
-  useranme: string;
+  username: string;
   isAdmin: boolean;
 };
 
@@ -15,11 +15,12 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type AuthProviderProps = {
-  children: ReactNode;
+  children: React.ReactNode;
 };
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const getCurrentUser = async () => {
     try {
@@ -27,6 +28,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       setUser(res.data.user);
     } catch (err) {
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 

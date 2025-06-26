@@ -4,6 +4,8 @@ import api from "../utils/axiosConfig";
 
 function Signup() {
   const [username, setUsername] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,24 +16,16 @@ function Signup() {
     e.preventDefault();
     setErrorMessage("");
 
-    if (password !== confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      return;
-    }
-
     try {
-      const response = await api.post("api/users", { username, password, confirmPassword, email });
+      const response = await api.post("api/users", { username, password, confirmPassword, firstName, lastName, email });
 
-      if (response.status === 200) {
-        navigate("/login");
-      }
+      navigate("/login");
     } catch (error: any) {
-      console.error("Signup error: ", error);
+      if (import.meta.env.MODE === "development") console.error("Signup error:", error);
       setErrorMessage(error.response?.data?.message || "Signup failed. Please try again.");
-      setUsername("");
+      setEmail("");
       setPassword("");
       setConfirmPassword("");
-      setEmail("");
     }
   };
 
@@ -46,6 +40,29 @@ function Signup() {
           value={username}
           maxLength={25}
           onChange={(e) => setUsername(e.target.value)}
+          autoComplete="off"
+          required
+        />
+
+        <label htmlFor="firstName">First Name: </label>
+        <input
+          type="text"
+          id="firstName"
+          value={firstName}
+          maxLength={30}
+          onChange={(e) => setFirstName(e.target.value)}
+          autoComplete="off"
+          required
+        />
+
+        <label htmlFor="lastName">Last Name: </label>
+        <input
+          type="text"
+          id="lastName"
+          value={lastName}
+          maxLength={30}
+          onChange={(e) => setLastName(e.target.value)}
+          autoComplete="off"
           required
         />
 
@@ -59,6 +76,7 @@ function Signup() {
           value={password}
           maxLength={50}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="off"
           required
         />
 
@@ -69,6 +87,7 @@ function Signup() {
           value={confirmPassword}
           maxLength={50}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          autoComplete="off"
           required
         />
 
