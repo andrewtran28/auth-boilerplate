@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 
-const Home = () => {
+const UserPage = () => {
   const { user } = useAuth();
 
   return (
@@ -9,10 +9,19 @@ const Home = () => {
       {user ? (
         <>
           <h1>
-            Welcome back, {user.firstName} {user.lastName}!
+            This is the User Page for {user.firstName} ({user.username})!
           </h1>
           <hr />
-          You are logged in as {user.username}.
+          <h2>User Information</h2>
+          <ul>
+            <li>Username: {user.username}</li>
+            <li>
+              Name: {user.firstName} {user.lastName}
+            </li>
+            <li>Email: {user.email}</li>
+            <li>User ID: {user.id}</li>
+            <li>Role: {user.isAdmin ? "Admin" : "User"}</li>
+          </ul>
         </>
       ) : (
         <>
@@ -26,4 +35,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default UserPage;

@@ -7,27 +7,29 @@ function Header() {
   return (
     <header>
       <Link to="/">Home</Link>
-      {user ? (
-        <>
-          <span>Hello, </span>
-          <Link to={`/users`}>{user.username}</Link>
-          <div>
-            <Link to={`/users`}>
-              <button>Your Account</button>
+      <div>
+        {user ? (
+          <>
+            <span>Hello, </span>
+            <Link to="/user">{user.username}</Link>
+            <div>
+              <Link to="/user">
+                <button>Your Account</button>
+              </Link>
+              <button onClick={logout}>Logout</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <Link to="/login">
+              <button>Login</button>
             </Link>
-            <button onClick={logout}>Logout</button>
-          </div>
-        </>
-      ) : (
-        <>
-          <Link to="/login">
-            <button>Login</button>
-          </Link>
-          <Link to="/signup">
-            <button>Sign Up</button>
-          </Link>
-        </>
-      )}
+            <Link to="/signup">
+              <button>Sign Up</button>
+            </Link>
+          </>
+        )}
+      </div>
     </header>
   );
 }

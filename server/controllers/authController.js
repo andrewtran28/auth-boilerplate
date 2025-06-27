@@ -64,6 +64,7 @@ const logOutUser = (req, res) => {
   res.clearCookie("token").clearCookie("refreshToken").json({ success: true, message: "Logged out" });
 };
 
+//Refresh short-lived token based on refresh token
 const refreshToken = asyncHandler(async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.status(401).json({ message: "Unauthorized" });

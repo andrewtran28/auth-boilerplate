@@ -1,12 +1,13 @@
+import { ReactElement } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 
-const ProtectedRoute = (element) => {
-  const { user, loading } = useAuth();
+type ProtectedRouteProps = {
+  element: ReactElement;
+};
 
-  if (loading) {
-    return null;
-  }
+const ProtectedRoute = ({ element }: ProtectedRouteProps) => {
+  const { user } = useAuth();
 
   return user ? element : <Navigate to="/login" replace />;
 };
