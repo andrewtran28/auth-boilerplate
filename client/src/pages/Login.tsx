@@ -19,7 +19,6 @@ function Login() {
     } catch (error: any) {
       console.error("Login error: ", error);
       setErrorMessage(error.response?.data?.message || "Login failed. Please try again.");
-      setUsername("");
       setPassword("");
     }
   };

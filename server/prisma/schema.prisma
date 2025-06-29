@@ -14,14 +14,16 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid()) @db.Uuid
-  username      String    @unique @db.VarChar(30)
-  firstName     String    @db.VarChar(30)
-  lastName      String    @db.VarChar(30)
-  password      String    @db.VarChar(100)
-  email         String    @unique @db.VarChar(254)
-  isAdmin       Boolean   @default(false)
-  createdAt     DateTime  @default(now())
+  id              String      @id @default(uuid()) @db.Uuid
+  username        String      @unique @db.VarChar(30)
+  firstName       String      @db.VarChar(30)
+  lastName        String      @db.VarChar(30)
+  password        String      @db.VarChar(100)
+  email           String      @unique @db.VarChar(254)
+  isAdmin         Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  loginAttempts   Int         @default(0)
+  lockOutUntil    DateTime?
 
   @@map("users")
 }

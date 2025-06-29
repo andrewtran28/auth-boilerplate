@@ -24,20 +24,48 @@ const getCurrentUser = (req, res) => {
 //Verifies credentials, issues token via res.cookie()
 const logInUser = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_TIME_MIN = 15;
 
-  const user = await prisma.user.findUnique({
-    where: { username: username },
-  });
+  const user = await prisma.user.findUnique({ where: { username: username } });
   if (!user) {
-    console.error(`Login failed: User does not exist (${username})`);
+    // Add mock delay to mitigate user enumeration
+    await new Promise((resolve) => setTimeout(resolve, 500));
     return res.status(401).json({ message: "Invalid username or password." });
+  }
+
+  //Verify if account is locked
+  if (user.lockOutUntil && new Date() < user.lockOutUntil) {
+    const minutes = Math.ceil((user.lockOutUntil - new Date()) / 1000 / 60);
+    console.warn(`User ${username} is locked out until ${user.lockOutUntil}`);
+    return res.status(403).json({ message: `Account locked. Try again in ${minutes} minutes.` });
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    console.error(`Login failed: Invalid password for user (${username})`);
+    const updated = {
+      loginAttempts: user.loginAttempts + 1,
+    };
+
+    if (updated.loginAttempts >= MAX_ATTEMPTS) {
+      updated.lockOutUntil = new Date(Date.now() + LOCKOUT_TIME_MIN * 60 * 1000);
+      updated.loginAttempts = 0;
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: updated,
+    });
+
+    console.warn(`Failed login attempt for ${username}. Attempt ${updated.loginAttempts}`);
     return res.status(401).json({ message: "Invalid username or password." });
   }
+
+  // Reset attempts on successful login
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { loginAttempts: 0, lockOutUntil: null },
+  });
 
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
@@ -47,7 +75,7 @@ const logInUser = asyncHandler(async (req, res) => {
       httpOnly: true,
       sameSite: "Lax",
       secure: process.env.NODE_ENV === "production",
-      maxAge: 15 * 60 * 1000, // 15 min
+      maxAge: 30 * 60 * 1000, // 30 min
     })
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
