@@ -13,6 +13,7 @@ function UserPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -81,7 +82,8 @@ function UserPage() {
       if (!res.ok) {
         setErrorMessage(data.message || "Failed to change password.");
       } else {
-        alert("Password changed successfully.");
+        setSuccessMessage("Password updated successfully!");
+        setTimeout(() => setSuccessMessage(""), 5000);
         setShowChangePasswordForm(false);
         setCurrentPassword("");
         setNewPassword("");
@@ -181,6 +183,7 @@ function UserPage() {
           </div>
 
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          {successMessage && <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>}
         </>
       ) : (
         <>

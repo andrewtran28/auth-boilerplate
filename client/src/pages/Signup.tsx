@@ -1,5 +1,6 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../utils/AuthContext";
 import api from "../utils/axiosConfig";
 
 function Signup() {
@@ -9,8 +10,16 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | string[]>("");
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/user");
+    }
+  }, [user, loading, navigate]);
 
   const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,8 +27,9 @@ function Signup() {
 
     try {
       const response = await api.post("api/users", { username, password, confirmPassword, firstName, lastName, email });
-
-      navigate("/login");
+      setSuccessMessage("Signup successful! Redirecting to login...");
+      setErrorMessage("");
+      setTimeout(() => navigate("/login"), 5000);
     } catch (error: any) {
       console.error("Signup error:", error);
       const backendErrors = error.response?.data?.errors;
@@ -31,8 +41,12 @@ function Signup() {
       setEmail("");
       setPassword("");
       setConfirmPassword("");
+    } finally {
+      setSuccessMessage("");
     }
   };
+
+  if (loading || user) return null;
 
   return (
     <div id="login">
@@ -96,6 +110,8 @@ function Signup() {
           required
         />
 
+        {successMessage && <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>}
+
         {errorMessage && (
           <ul className="error-message">
             {Array.isArray(errorMessage) ? (
@@ -106,7 +122,9 @@ function Signup() {
           </ul>
         )}
 
-        <button type="submit">Sign Up</button>
+        <button type="submit" disabled={successMessage}>
+          Sign Up
+        </button>
       </form>
     </div>
   );

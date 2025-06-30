@@ -1,7 +1,9 @@
 const asyncHandler = require("express-async-handler");
+const { v4: uuidv4 } = require("uuid");
+const { sendEmail } = require("../utils/sendEmail");
+const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const generateAccessToken = (user) => {
@@ -116,9 +118,100 @@ const refreshToken = asyncHandler(async (req, res) => {
   }
 });
 
+const forgotPassword = asyncHandler(async (req, res) => {
+  const { userInput } = req.body;
+  const user = await prisma.user.findFirst({
+    where: {
+      OR: [{ email: userInput }, { username: userInput }],
+    },
+  });
+
+  const MESSAGE_FORGET =
+    "If an account with that username or email exists, a password reset link will be sent to that email.";
+
+  if (!user) return res.status(200).json({ message: MESSAGE_FORGET });
+
+  const token = uuidv4();
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      resetToken: token,
+      resetTokenExpiry: expires,
+    },
+  });
+
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Auth Boilerplate - Password Reset Request",
+    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n
+        Please click on the following link, or paste this into your browser to complete the process:\n\n
+        ${resetUrl}\n\n
+        This link will expire in 24 hours.\n
+        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+  });
+
+  res.status(200).json({ message: MESSAGE_FORGET });
+});
+
+const getResetPasswordUser = asyncHandler(async (req, res) => {
+  const { token } = req.params;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: {
+        gte: new Date(),
+      },
+    },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired reset token." });
+  }
+
+  res.json({ username: user.username });
+});
+
+const resetPassword = asyncHandler(async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: {
+        gte: new Date(),
+      },
+    },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired reset token." });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+
+  res.json({ message: "Password updated successfully." });
+});
+
 module.exports = {
   getCurrentUser,
   logInUser,
   logOutUser,
   refreshToken,
+  forgotPassword,
+  getResetPasswordUser,
+  resetPassword,
 };

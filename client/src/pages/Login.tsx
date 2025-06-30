@@ -1,27 +1,38 @@
-import { useState, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, FormEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 
 function Login() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const { login } = useAuth();
+  const [disableSubmit, setDisableSubmit] = useState(false);
+  const { user, loading, login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user) {
+      navigate("/user");
+    }
+  }, [user, loading, navigate]);
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrorMessage("");
 
     try {
+      setDisableSubmit(true);
       await login(username, password);
-      navigate("/");
     } catch (error: any) {
       console.error("Login error: ", error);
       setErrorMessage(error.response?.data?.message || "Login failed. Please try again.");
       setPassword("");
+    } finally {
+      setDisableSubmit(false);
     }
   };
+
+  if (loading || user) return null;
 
   return (
     <div id="login">
@@ -39,8 +50,17 @@ function Login() {
           </p>
         )}
 
-        <button type="submit">Log In</button>
+        <button type="submit" disabled={disableSubmit}>
+          Log In
+        </button>
       </form>
+
+      <p>
+        Don't have an account? <Link to="/signup">Sign Up</Link>
+      </p>
+      <p>
+        Forgot your password? <Link to="/forgot-password">Reset Password</Link>
+      </p>
     </div>
   );
 }
