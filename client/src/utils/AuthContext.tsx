@@ -14,6 +14,7 @@ type AuthContextType = {
   user: User | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
+  loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,13 +25,19 @@ type AuthProviderProps = {
 
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const getCurrentUser = async () => {
     try {
-      const res = await axios.get("/api/auth");
+      const res = await axios.get("/api/auth", { withCredentials: true });
       setUser(res.data.user);
-    } catch (err) {
+    } catch (err: any) {
+      if (err.response?.status !== 401) {
+        console.error("Failed to fetch current user:", err);
+      }
       setUser(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +60,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     getCurrentUser();
   }, []);
 
-  return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, logout, loading }}>{children}</AuthContext.Provider>;
 };
 
 const useAuth = () => {
