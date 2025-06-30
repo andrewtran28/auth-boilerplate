@@ -59,13 +59,17 @@ const signupValidator = [
     }),
 ];
 
-const passwordValidator = [
-  body("password").trim().isLength({ min: 6, max: 50 }).withMessage("Password must be between 6-50 characters.").bail(),
+const changePassValidator = [
+  body("newPassword")
+    .trim()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("New password must be between 6-50 characters.")
+    .bail(),
   body("confirmPassword")
     .trim()
     .custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords do not match.");
+      if (value !== req.body.newPassword) {
+        throw new Error("New passwords do not match.");
       }
       return true;
     }),
@@ -84,6 +88,6 @@ const handleValidationErrors = (req) => {
 
 module.exports = {
   signupValidator,
-  passwordValidator,
+  changePassValidator,
   handleValidationErrors,
 };

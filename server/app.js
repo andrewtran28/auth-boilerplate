@@ -23,7 +23,7 @@ app.use("/api/users", usersRouter);
 //Global error handling middleware
 app.use((err, req, res, next) => {
   // Remove the following sensitive data from req.body
-  const { password, confirmPassword, email, ...safeBody } = req.body || {};
+  const { password, confirmPassword, newPassword, currentPassword, email, ...safeBody } = req.body || {};
 
   console.error(`ERROR: ${req.method} ${req.url}`, {
     user: req.user ? req.user.username : "Unauthenticated user",

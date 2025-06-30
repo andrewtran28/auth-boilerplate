@@ -2,6 +2,8 @@ const asyncHandler = require("express-async-handler");
 const { v4: uuidv4 } = require("uuid");
 const { sendEmail } = require("../utils/sendEmail");
 const { PrismaClient } = require("@prisma/client");
+const { handleValidationErrors } = require("../utils/validator");
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
@@ -177,6 +179,7 @@ const getResetPasswordUser = asyncHandler(async (req, res) => {
 });
 
 const resetPassword = asyncHandler(async (req, res) => {
+  handleValidationErrors(req);
   const { token, newPassword } = req.body;
 
   const user = await prisma.user.findFirst({

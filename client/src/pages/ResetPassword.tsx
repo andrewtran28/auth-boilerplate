@@ -9,7 +9,7 @@ function ResetPassword() {
   const [username, setUsername] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string | string[]>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   const navigate = useNavigate();
@@ -43,19 +43,27 @@ function ResetPassword() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (newPassword !== confirmPassword) {
-      return setErrorMessage("Passwords do not match.");
-    }
+    // if (newPassword !== confirmPassword) {
+    //   return setErrorMessage("Passwords do not match.");
+    // }
 
     try {
-      const response = await api.post("/api/auth/reset-password", { token, newPassword });
+      const response = await api.post("/api/auth/reset-password", { token, newPassword, confirmPassword });
 
       setErrorMessage("");
       setSuccessMessage("Password updated successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 5000);
     } catch (error: any) {
       console.error(error);
-      setErrorMessage(error.response?.data?.message || "Failed to reset password.");
+
+      const errors = error.response?.data?.errors;
+      const message = error.response?.data?.message;
+
+      if (Array.isArray(errors)) {
+        setErrorMessage(errors);
+      } else {
+        setErrorMessage(message || "Failed to reset password.");
+      }
     }
   };
 
@@ -65,45 +73,45 @@ function ResetPassword() {
     <div id="login">
       <h1 id="login-title">Reset Password</h1>
 
-      {errorMessage ? (
-        <p style={{ color: "red" }}>{errorMessage}</p>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <p>
-            Resetting password for <strong>{username}</strong>
-          </p>
+      <form onSubmit={handleSubmit}>
+        <p>
+          Resetting password for <strong>{username}</strong>
+        </p>
 
-          <label htmlFor="newPassword">New Password:</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            maxLength={50}
-          />
+        <label htmlFor="newPassword">New Password:</label>
+        <input
+          type="password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          required
+          maxLength={50}
+        />
 
-          <label htmlFor="confirmPassword">Confirm New Password:</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            maxLength={50}
-          />
+        <label htmlFor="confirmPassword">Confirm New Password:</label>
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          maxLength={50}
+        />
 
-          <button type="submit" disabled={successMessage}>
-            Change Password
-          </button>
+        <button type="submit" disabled={successMessage}>
+          Change Password
+        </button>
 
-          {errorMessage && (
-            <p className="error-message" style={{ color: "red" }}>
-              {errorMessage}
-            </p>
-          )}
+        {errorMessage && (
+          <ul className="error-message">
+            {Array.isArray(errorMessage) ? (
+              errorMessage.map((msg, idx) => <li key={idx}>{msg}</li>)
+            ) : (
+              <li>{errorMessage}</li>
+            )}
+          </ul>
+        )}
 
-          {successMessage && <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>}
-        </form>
-      )}
+        {successMessage && <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>}
+      </form>
     </div>
   );
 }

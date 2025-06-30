@@ -41,6 +41,8 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const changePassword = asyncHandler(async (req, res) => {
+  handleValidationErrors(req);
+
   const { currentPassword, newPassword } = req.body;
 
   if (!req.user || !currentPassword || !newPassword) {

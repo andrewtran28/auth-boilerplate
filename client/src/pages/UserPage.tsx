@@ -12,9 +12,9 @@ function UserPage() {
   const [showChangePasswordForm, setShowChangePasswordForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | string[]>("");
 
   const navigate = useNavigate();
 
@@ -57,37 +57,34 @@ function UserPage() {
     setErrorMessage("");
     setCurrentPassword("");
     setNewPassword("");
-    setConfirmNewPassword("");
+    setConfirmPassword("");
     setDeletePassword("");
+    setSuccessMessage("");
   };
 
   const handleChangePassword = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (newPassword !== confirmNewPassword) {
-      setErrorMessage("New passwords do not match.");
-      return;
-    }
 
     try {
       const res = await fetch(`${API_BASE_URL}/api/users`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setErrorMessage(data.message || "Failed to change password.");
+        if (Array.isArray(data.errors)) {
+          setErrorMessage(data.errors);
+        } else {
+          setErrorMessage(data.message || "Failed to change password.");
+        }
       } else {
         setSuccessMessage("Password updated successfully!");
-        setTimeout(() => setSuccessMessage(""), 5000);
-        setShowChangePasswordForm(false);
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmNewPassword("");
+        setErrorMessage("");
+        setTimeout(() => handleCancel(), 5000);
       }
     } catch (err) {
       setErrorMessage("Current password is incorrect.");
@@ -133,8 +130,8 @@ function UserPage() {
                 <label>Confirm New Password:</label>
                 <input
                   type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
                 <button type="submit">Submit</button>
@@ -182,7 +179,15 @@ function UserPage() {
             )}
           </div>
 
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          {errorMessage && (
+            <ul className="error-message">
+              {Array.isArray(errorMessage) ? (
+                errorMessage.map((msg, idx) => <li key={idx}>{msg}</li>)
+              ) : (
+                <li>{errorMessage}</li>
+              )}
+            </ul>
+          )}
           {successMessage && <p style={{ color: "green", marginTop: "10px" }}>{successMessage}</p>}
         </>
       ) : (
