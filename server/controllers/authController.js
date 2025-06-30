@@ -89,7 +89,7 @@ const logInUser = asyncHandler(async (req, res) => {
 
 //Clears the token
 const logOutUser = (req, res) => {
-  res.clearCookie("token").clearCookie("refreshToken").json({ success: true, message: "Logged out" });
+  res.clearCookie("token").json({ success: true, message: "Logged out" });
 };
 
 //Refresh short-lived token based on refresh token

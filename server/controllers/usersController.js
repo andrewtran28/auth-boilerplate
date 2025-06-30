@@ -40,6 +40,33 @@ const createUser = asyncHandler(async (req, res) => {
   res.status(201).json({ message: "User successfully created." });
 });
 
+const changePassword = asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!req.user || !currentPassword || !newPassword) {
+    return res.status(400).json({ message: "Missing required fields." });
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+  if (!user) {
+    return res.status(404).json({ message: "User not found." });
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isValid) {
+    return res.status(401).json({ message: "Current password is incorrect." });
+  }
+
+  const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: req.user.id },
+    data: { password: hashedNewPassword },
+  });
+
+  res.status(200).json({ message: "Password updated successfully." });
+});
+
 const deleteUser = asyncHandler(async (req, res) => {
   const { password } = req.body;
   if (!req.user || !password) {
@@ -68,5 +95,6 @@ const deleteUser = asyncHandler(async (req, res) => {
 module.exports = {
   getUserInfo,
   createUser,
+  changePassword,
   deleteUser,
 };
