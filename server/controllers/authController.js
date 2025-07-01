@@ -93,7 +93,15 @@ const logInUser = asyncHandler(async (req, res) => {
 
 //Clears the token
 const logOutUser = (req, res) => {
-  res.clearCookie("token").json({ success: true, message: "Logged out" });
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res
+    .clearCookie("token", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+    })
+    .json({ success: true, message: "Logged out" });
 };
 
 //Refresh short-lived token based on refresh token
