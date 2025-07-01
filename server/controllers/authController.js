@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require("uuid");
 const { sendEmail } = require("../utils/sendEmail");
 const { PrismaClient } = require("@prisma/client");
 const { handleValidationErrors } = require("../utils/validator");
-
+const isProduction = process.env.NODE_ENV === "production";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
@@ -77,14 +77,14 @@ const logInUser = asyncHandler(async (req, res) => {
   res
     .cookie("token", accessToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
       maxAge: 30 * 60 * 1000, // 30 min
     })
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
     .status(200)
@@ -109,8 +109,8 @@ const refreshToken = asyncHandler(async (req, res) => {
     const newAccessToken = generateAccessToken(user);
     res.cookie("token", newAccessToken, {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
       maxAge: 15 * 60 * 1000, // 30 min
     });
 
@@ -149,11 +149,10 @@ const forgotPassword = asyncHandler(async (req, res) => {
   await sendEmail({
     to: user.email,
     subject: "Auth Boilerplate - Password Reset Request",
-    text: `You are receiving this because you (or someone else) have requested the reset the password for your Auth Boilerplateaccount.\n\n
-        Please click on the following link, or paste this into your browser to complete the process:\n\n
-        ${resetUrl}\n\n
-        This link will expire in 24 hours.\n
-        If you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    text: `You are receiving this because you (or someone else) have requested the reset the password for your Auth Boilerplate account.\n Please click the following link below, or paste this into your browser to reset your password:\n\n
+      ${resetUrl}\n\n
+    This link is only valid for 24 hours. If you did not request this, please ignore this email and your password will remain unchanged.\n\n
+    — The Auth Boilerplate Team`,
   });
 
   res.status(200).json({ message: MESSAGE_FORGET });
