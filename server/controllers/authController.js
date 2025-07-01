@@ -149,10 +149,14 @@ const forgotPassword = asyncHandler(async (req, res) => {
   await sendEmail({
     to: user.email,
     subject: "Auth Boilerplate - Password Reset Request",
-    text: `You are receiving this because you (or someone else) have requested the reset the password for your Auth Boilerplate account.\n Please click the following link below, or paste this into your browser to reset your password:\n\n
-      ${resetUrl}\n\n
-    This link is only valid for 24 hours. If you did not request this, please ignore this email and your password will remain unchanged.\n\n
-    — The Auth Boilerplate Team`,
+    text: `You are receiving this because you (or someone else) have requested to reset the password for your Auth Boilerplate account.
+Please click the following link below, or paste it into your browser to reset your password:
+
+  ${resetUrl}
+
+This link is only valid for 24 hours. If you did not request this, please ignore this email and your password will remain unchanged.
+
+— The Auth Boilerplate Team`,
   });
 
   res.status(200).json({ message: MESSAGE_FORGET });
