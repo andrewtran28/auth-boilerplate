@@ -77,13 +77,13 @@ const logInUser = asyncHandler(async (req, res) => {
   res
     .cookie("token", accessToken, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
       maxAge: 30 * 60 * 1000, // 30 min
     })
     .cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     })
@@ -109,7 +109,7 @@ const refreshToken = asyncHandler(async (req, res) => {
     const newAccessToken = generateAccessToken(user);
     res.cookie("token", newAccessToken, {
       httpOnly: true,
-      sameSite: "Lax",
+      sameSite: "none",
       secure: process.env.NODE_ENV === "production",
       maxAge: 15 * 60 * 1000, // 30 min
     });
