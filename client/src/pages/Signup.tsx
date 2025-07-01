@@ -12,6 +12,7 @@ function Signup() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | string[]>("");
+  const [disableSubmit, setDisableSubmit] = useState(false);
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -26,6 +27,7 @@ function Signup() {
     setErrorMessage("");
 
     try {
+      setDisableSubmit(true);
       const response = await api.post("api/users", { username, password, confirmPassword, firstName, lastName, email });
       setSuccessMessage("Signup successful! Redirecting to login...");
       setErrorMessage("");
@@ -43,6 +45,7 @@ function Signup() {
       setConfirmPassword("");
     } finally {
       setSuccessMessage("");
+      setDisableSubmit(false);
     }
   };
 

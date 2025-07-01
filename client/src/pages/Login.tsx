@@ -3,9 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../utils/AuthContext";
 
 function Login() {
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [disableSubmit, setDisableSubmit] = useState(false);
   const { user, loading, login } = useAuth();
   const navigate = useNavigate();
