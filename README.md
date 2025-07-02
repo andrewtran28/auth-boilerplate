@@ -1,6 +1,9 @@
 # auth-boilerplate
 A practical user authentication boilerplate that is intended to be minimalistic and re-usable for other full-stack projects. Styling of the boilerplate is kept to a minimum to emphasize its scalability and pure functional purpose.
 
+![Screenshot from 2025-06-30 18-45-35](https://github.com/user-attachments/assets/7261f0fa-d8e0-4d47-b5c1-48ae79461fa3)
+
+
 ## Authentication Strategy
 This project implements a robust full-stack JWT-based authentication system using HTTP-only cookies for secure session management. It is designed for use in full-stack applications and prioritizes security, user experience, and flexibility across both development and production environments.
 
