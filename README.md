@@ -6,28 +6,30 @@ A practical user authentication boilerplate that is intended to be minimalistic 
 ## Authentication Strategy
 This project implements a robust full-stack JWT-based authentication system using HTTP-only cookies for secure session management. It is designed for use in full-stack applications and prioritizes security, user experience, and flexibility across both development and production environments.
 
-#### 1. Login Flow
-- Users log in with their credentials to the Express back-end. If valid, a JWT acces token is generated contianing the user's ID and username. This token is set in a secure, HTTP-only cookie which prevents access by JavaScript and automatically attaches to requests (i.e., cookie-based auth).
-#### 2. Protected Routes
-- Back-end routes use a custom authenticationToken middleware that reads the JWT from the HTTP-only cookie (i.e., Access Token), verifies and decodes it using jsonwebtoken, and attaches the authenticated user to req.user for downstream handlers. Protected routes such as the "User Page" are only displayed if the user is logged in and will only see their information.
-#### 3. Token Refresh Flow
-- The auth boilerplate utilizes a dual-cookie strategy: A short-lived (30min) Access Token, and a long-lived (7 days) Refresh Token. The Access Token is attached to all HTTP requests as an HTTP-only cookie, while the Refresh Token is used to obtain new Access Tokens without requiring to log in again.
-- When the Access Token expires, the front-end can silently call the "refresh" route to obtain a new Access Token --only if the Refresh Token is still valid. If the Refresh Token is missing or expired, the user muust log in again.
-- Refresh Tokens are never exposed to JavaScript as they are not stored in localStorage or sessionStorage, but rather HTTP-only cookies.
-#### 4. Additional Features
-- Brute-force Login Protection: Locks accounts after a certain number of failed attempts for 15 minutes. Automatically resets on successful login.
-- Password Reset With Email: Users can request a password reset via username or email. Secure time-limited token (UUIDv4) is emailed using Resend that is only valid for 24 hours.
-  - Anti-user enumeration response hides existence of accounts ("If the user exists, an email has been sent").
+### 1. Login Flow
+- Users submit their credentials to the Express backend.
+- Upon successful login, a short-lived Access Token (30 minutes) and a long-lived Refresh Token (7 days) are issued as secure, HTTP-only cookies.
+- These tokens are not accessible via JavaScript (`httpOnly: true`) and are automatically included in future HTTP requests by the browser.
+
+### 2. Protected Routes
+- Backend routes use a custom `authenticateToken` middleware that reads the Access Token from the cookie, verifies it using `jsonwebtoken`, and attaches the authenticated user to `req.user`.
+- Frontend pages like the "User Page" are protected using a `ProtectedRoute` component, which ensures only authenticated users can access them.
+
+### 3. Token Refresh Flow
+- When the Access Token expires, the frontend can make a silent request to a `/api/auth/refresh` route to obtain a new Access Token, as long as the Refresh Token is still valid.
+- If the Refresh Token is missing or expired, the user must log in again.
+- Neither token is stored in `localStorage` or `sessionStorage`; both are managed via secure HTTP-only cookies.
+
+### 4. Additional Features
+- **Brute-force Protection:** After a configurable number of failed login attempts, the account is temporarily locked (e.g., 15 minutes). Lock resets on successful login.
+- **Secure Password Reset:**
+  - Users can request a password reset by submitting their username or email.
+  - If an account is found, a 24-hour time-limited reset link is emailed using [Resend](https://resend.com/). Previously used AWS SES, however Resend is a free-alternative.
+  - Anti-enumeration measures: The frontend always shows a generic success message (e.g., “If the user exists, an email has been sent.”).
 
 ## Technology Used
-- React + Vite
-- TypeScript
-- HTML + CSS
-- Node.js + Express
-- PostgreSQL
-- Prisma ORM
-- Resend (Email API)
-  - AWS SES (Email API; Later replaced with Resend as a free alternative)
-- Netlify (Client-side deployment)
-- Render (Back-end web service)
-- Neon (Database hosting)
+- **Frontend:** React + Vite, TypeScript, HTML, CSS
+- **Backend:** Node.js + Express, Prisma ORM, PostgreSQL
+- **Authentication:** JWT (access + refresh tokens), HTTP-only cookies
+- **Email API:** Resend (formerly AWS SES)
+- **Hosting:** Netlify (frontend), Render (backend), Neon (PostgreSQL database)
