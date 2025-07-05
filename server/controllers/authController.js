@@ -101,6 +101,11 @@ const logOutUser = (req, res) => {
       secure: isProduction,
       sameSite: isProduction ? "None" : "Lax",
     })
+    .clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+    })
     .json({ success: true, message: "Logged out" });
 };
 
@@ -119,7 +124,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       httpOnly: true,
       sameSite: isProduction ? "none" : "lax",
       secure: isProduction,
-      maxAge: 15 * 60 * 1000, // 30 min
+      maxAge: 30 * 60 * 1000, // 30 min
     });
 
     res.status(200).json({ success: true, message: "Token refreshed" });

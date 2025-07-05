@@ -9,7 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import UserPage from "./pages/UserPage";
 import ErrorPage from "./pages/ErrorPage";
-import "./App.css";
+import "./styles/App.css";
 
 function App() {
   return (
