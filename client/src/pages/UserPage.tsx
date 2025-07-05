@@ -116,29 +116,37 @@ function UserPage() {
             )}
 
             {showChangePasswordForm && (
-              <form onSubmit={handleChangePassword}>
-                <h2>Change Password</h2>
-                <label>Current Password:</label>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                />
-                <label>New Password:</label>
-                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
-                <label>Confirm New Password:</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <button type="submit">Submit</button>
-                <button type="button" onClick={handleCancel}>
-                  Cancel
-                </button>
-              </form>
+              <>
+                <hr />
+                <form onSubmit={handleChangePassword}>
+                  <h2>Change Password</h2>
+                  <label>Current Password:</label>
+                  <input
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                  />
+                  <label>New Password:</label>
+                  <input
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                  <label>Confirm New Password:</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                  <button type="submit">Submit</button>
+                  <button type="button" onClick={handleCancel}>
+                    Cancel
+                  </button>
+                </form>
+              </>
             )}
           </div>
 

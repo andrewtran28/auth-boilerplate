@@ -35,3 +35,7 @@ header {
   justify-content: space-between;
   max-width: 1200px;
 }
+
+button {
+  margin: 5px 5px 5px 0px;
+}
