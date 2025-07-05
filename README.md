@@ -13,7 +13,7 @@ This project implements a robust full-stack JWT-based authentication system usin
 
 ### 2. Protected Routes
 - Backend routes use a custom `authenticateToken` middleware that reads the Access Token from the cookie, verifies it using `jsonwebtoken`, and attaches the authenticated user to `req.user`.
-- Frontend pages like the "User Page" are protected using a `ProtectedRoute` component, which ensures only authenticated users can access them.
+- On the frontend, protected pages are wrapped in a `ProtectedRoute` component that uses the `useAuth` hook (from `AuthContext`) to check if a user is authenticated and access user info such as roles or permissions. If unauthenticated, users are redirected to the login page.
 
 ### 3. Token Refresh Flow
 - When the Access Token expires, the frontend can make a silent request to a `/api/auth/refresh` route to obtain a new Access Token, as long as the Refresh Token is still valid.
@@ -26,6 +26,28 @@ This project implements a robust full-stack JWT-based authentication system usin
   - Users can request a password reset by submitting their username or email.
   - If an account is found, a 24-hour time-limited reset link is emailed using [Resend](https://resend.com/). Previously used AWS SES, however Resend is a free-alternative.
   - Anti-enumeration measures: The frontend always shows a generic success message (e.g., “If the user exists, an email has been sent.”).
+
+## Prisma Schema (User Model)
+This boilerplate uses [Prisma ORM](https://www.prisma.io/) to interact with a PostgreSQL database. The User model is intentionally minimal, providing just enough structure for authentication, role-based access control, password reset, and security features such as brute-force protection.
+
+```prisma
+model User {
+  id                String     @id @default(uuid()) @db.Uuid
+  username          String     @unique @db.VarChar(30)
+  firstName         String     @db.VarChar(30)
+  lastName          String     @db.VarChar(30)
+  password          String     @db.VarChar(100)
+  email             String     @unique @db.VarChar(254)
+  isAdmin           Boolean    @default(false)
+  createdAt         DateTime   @default(now())
+  loginAttempts     Int        @default(0)
+  lockOutUntil      DateTime?
+  resetToken        String?    @db.VarChar(255)
+  resetTokenExpiry  DateTime?
+
+  @@map("users")
+}
+```
 
 ## Technology Used
 - **Frontend:** React + Vite, TypeScript, HTML, CSS
