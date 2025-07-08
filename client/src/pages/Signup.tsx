@@ -15,6 +15,7 @@ function Signup() {
   const [disableSubmit, setDisableSubmit] = useState(false);
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [revealPassword, setRevealPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -47,6 +48,10 @@ function Signup() {
       setSuccessMessage("");
       setDisableSubmit(false);
     }
+  };
+
+  const toggleRevealPassword = () => {
+    setRevealPassword(!revealPassword);
   };
 
   if (loading || user) return null;
@@ -92,19 +97,24 @@ function Signup() {
         <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
         <label htmlFor="password">Password: </label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          maxLength={50}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="off"
-          required
-        />
+        <div className="password-input">
+          <input
+            type={revealPassword ? "text" : "password"}
+            id="password"
+            value={password}
+            maxLength={50}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete="off"
+            required
+          />
+          <button type="button" onClick={toggleRevealPassword}>
+            {revealPassword ? "Hide" : "Reveal"}
+          </button>
+        </div>
 
         <label htmlFor="confirmPassword">Confirm Password: </label>
         <input
-          type="password"
+          type={revealPassword ? "text" : "password"}
           id="confirmPassword"
           value={confirmPassword}
           maxLength={50}

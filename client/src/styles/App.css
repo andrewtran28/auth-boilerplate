@@ -39,3 +39,12 @@ header {
 button {
   margin: 5px 5px 5px 0px;
 }
+
+.password-input {
+  display: flex;
+  margin-bottom: 16px;
+}
+.password-input input,
+.password-input button {
+  margin: 0 5px 0 0;
+}
