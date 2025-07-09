@@ -30,10 +30,20 @@ main {
 }
 
 header {
+  position: relative;
   margin: 20px;
   display: flex;
   justify-content: space-between;
   max-width: 1200px;
+}
+
+.login-modal {
+  position: absolute;
+  top: 2rem; /* Adjust depending on header height */
+  right: 0;
+  z-index: 1000;
+  border: 1px solid #ffffff;
+  padding: 10px;
 }
 
 button {

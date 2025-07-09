@@ -11,6 +11,7 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const loginError = location.state?.errorMessage || "";
 
   useEffect(() => {
     if (!loading && user) {
@@ -46,9 +47,9 @@ function Login() {
         <label htmlFor="password">Password: </label>
         <input type="password" value={password} maxLength={50} onChange={(e) => setPassword(e.target.value)} required />
 
-        {errorMessage && (
+        {(errorMessage || loginError) && (
           <p className="error-message" style={{ color: "red" }}>
-            {errorMessage}
+            {errorMessage || loginError}
           </p>
         )}
 
