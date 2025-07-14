@@ -1,7 +1,7 @@
 # auth-boilerplate
 A practical user authentication boilerplate that is intended to be minimalistic and re-usable for other full-stack projects. Styling of the boilerplate is kept to a minimum to emphasize its scalability and pure functional purpose.
 
-![image](https://github.com/user-attachments/assets/9ee1daaa-d760-4c64-b6d7-0f42d66bbb83)
+<img width="400" height="350" alt="image" src="https://github.com/user-attachments/assets/7e5d9ac7-8a10-4d7f-a2b6-96579096c83e" />
 
 ## Authentication Strategy
 This project implements a robust full-stack JWT-based authentication system using HTTP-only cookies for secure session management. It is designed for use in full-stack applications and prioritizes security, user experience, and flexibility across both development and production environments.
@@ -21,11 +21,12 @@ This project implements a robust full-stack JWT-based authentication system usin
 - Neither token is stored in `localStorage` or `sessionStorage`; both are managed via secure HTTP-only cookies.
 
 ### 4. Additional Features
-- **Brute-force Protection:** After a configurable number of failed login attempts, the account is temporarily locked (e.g., 15 minutes). Lock resets on successful login.
+- **Brute-force Login Protection:** After a configurable number of failed login attempts, the account is temporarily locked (e.g., 15 minutes). Lock resets on successful login.
 - **Secure Password Reset:**
   - Users can request a password reset by submitting their username or email.
   - If an account is found, a 24-hour time-limited reset link is emailed using [Resend](https://resend.com/). Previously used AWS SES, however Resend is a free-alternative.
   - Anti-enumeration measures: The frontend always shows a generic success message (e.g., “If the user exists, an email has been sent.”).
+- **Header Log In Modal**: Guest users are able to log in via the webpage header instead of a dedicated 'Log In' page (but still exists as an option). Upon successful login, the user is redirected to the last page they visited.
 
 ## Prisma Schema (User Model)
 This boilerplate uses [Prisma ORM](https://www.prisma.io/) to interact with a PostgreSQL database. The User model is intentionally minimal, providing just enough structure for authentication, role-based access control, password reset, and security features such as brute-force protection.
